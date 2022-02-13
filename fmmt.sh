@@ -12,58 +12,90 @@ COL_DFT="\033[0m"
 usage()
 {
 	# [ ! -z "$ARG" ] && echo "Unknown option: "$COL_ERR"${ARG%%=*}"$COL_DFT
-	echo "Usage: "$COL_WRN"fmmt [--tgt_dir=|-tg]=<target_directory> [--prefix=|-p]=<prefix> [--list-only|-lo] \"."$COL_DFT
+	echo "Usage: "$COL_WRN"fmmt [--src_dir=|-sd]=<source_directory> [--tgt_dir=|-td]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co]"$COL_DFT
 	echo "Bye!"
 	exit 1
 }
 
-usage_unknown_param()
+
+
+
+read_args()
 {
-    [ ! -z "$ARG" ] && echo "Unknown option: "$COL_ERR"${ARG%%=*}"$COL_DFT
-    usage
-}
-
-
-
-main()
-{
-    ARGS=$@
+    # ARGS=$@
     [ -z "$ARGS" ] && usage
-    for ARG in "$@"
+    for ARG in $ARGS #"$@"
     do
-    # echo "ARG: $ARG"
-    case $ARG in
-        -lo|--list-only)
-        LIST_ONLY="y"
-        ;;
+        case $ARG in
+            -d|--debug)
+            DEBUG="y"
+            ;;
+            
+            -co|--check-only)
+            CHECK_ONLY="y"
+            ;;
 
-        -td=*|--tgt_dir=*)
-        DIR_TGT="${ARG#*=}"
-        [ -z "$DIR_TGT" ] && usage
-        ;;
+            -td=*|--tgt_dir=*)
+            DIR_TGT="${ARG#*=}"
+            [ -z "$DIR_TGT" ] && usage
+            ;;
 
-        -p=*|--prefix=*)
-        PREFIX="${ARG#*=}"
-        [ -z "$PREFIX" ] && usage
-        ;;
-        
-        *)
-        echo "error: ${ARG#*=}"
-        usage_unknown_param
-        ;;
-    esac
+            -sd=*|--src_dir=*)
+            DIR_SRC="${ARG#*=}"
+            [ -z "$DIR_SRC" ] && usage
+            ;;
+
+            -p=*|--prefix=*)
+            PREFIX="${ARG#*=}"
+            [ -z "$PREFIX" ] && usage
+            ;;
+            
+            *)
+            echo "ERROR - unkwnon argument: $COL_ERR"${ARG%%=*}$COL_DFT
+            ;;
+        esac
     done
 }
 
 
+
+
+check_args()
+{
+    if [ ! -z $DEBUG ]; then
+        echo "Arguments:"
+        echo " - DEBUG: \"$DEBUG\""
+        echo " - CHECK_ONLY: \"$CHECK_ONLY\""
+        echo " - DIR_SRC: \"$DIR_SRC\""
+        echo " - All: "$ARGS
+    fi
+
+    if [ -z $DIR_SRC ] [ ! -z $DEBUG ] && ; then
+        echo "ERROR - "$COL_ERR"DIR_SRC"$COL_DFT" cannot be null!"
+        usage
+    fi
+}
+
+
+
+
+
+
 boh()
 {
+    echo "DIR_SRC: "$DIR_SRC # DEBUG
+    [ ! -z "$DIR_SRC" ] && cd $DIR_SRC
+
+
     echo "DIR_TGT: "$DIR_TGT # DEBUG
     [ ! -z "$DIR_TGT" ] && cd $DIR_TGT
 
 
+    pwd
+
     # for FL in $(find . -type f \( -name "*.jpg" -o -name "*.jpeg" \))
-    for FL in $(find . -type f \( -name "*.jpg" -o -name "*.jpeg" \) | grep -v $PREFIX | sort | uniq) # command substitution
+    for FL in $(find . -type f \( -name "*.jpg" -o -name "*.jpeg" \) | sort | uniq) # command substitution
+    # for FL in $(find . -type f \( -name "*.jpg" -o -name "*.jpeg" \) | grep -v $PREFIX | sort | uniq) # command substitution
     do
         FL_BASE=$(basename -- "$FL")
         echo "- "$FL_BASE
@@ -88,4 +120,8 @@ boh()
 
 
 
-main 
+ARGS=$@
+read_args
+check_args
+
+# boh
