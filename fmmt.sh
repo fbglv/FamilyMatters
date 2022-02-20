@@ -94,11 +94,19 @@ check_args()
 
 
 main()
-{
-    [ ! -z "$DIR_SRC" ] && cd $DIR_SRC
-    [ ! -z "$DIR_TGT" ] && cd $DIR_TGT
+{  
+    if [ -d "$DIR_SRC" ]
+    then
+        cd $DIR_SRC
+    else
+        echo $COL_ERR"The \""$DIR_SRC"\" directory does not exists."$COL_DFT" Bye!"
+        exit 1
+    fi
 
-    # pwd
+    for FILE in ./*
+    do
+        echo "file: "$FILE
+    done
 }
 
 
