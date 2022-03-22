@@ -67,7 +67,7 @@ read_args()
 
 
 #
-#   Once the input arguments have been parsed, their combination validity is checked
+#   Checks input parameters' combination validity
 #
 check_args()
 {
@@ -90,6 +90,35 @@ check_args()
 
 
 
+check_file()
+{
+    FILE_EXT=$(echo "${FILE##*.}" |  tr '[:upper:]' '[:lower:]' )
+
+    #
+    #   Checks the file type based on the file extensions
+    #
+    case $FILE_EXT in
+    "jpg")
+        FILE_TYPE="jpeg"
+    ;;
+    "jpeg")
+        FILE_TYPE="jpeg"
+    ;;
+    "heic")
+        FILE_TYPE="jpeg"
+    ;;
+    esac
+
+    if [ -z $FILE_TYPE ]; then
+        echo "  ERROR - "$COL_ERR"file type not recognized!"$COL_DFT
+    else
+        echo "  Type: "$FILE_TYPE
+    fi
+}
+
+
+
+
 
 
 
@@ -106,6 +135,7 @@ main()
     for FILE in ./*
     do
         echo "file: "$FILE
+        check_file
     done
 }
 
