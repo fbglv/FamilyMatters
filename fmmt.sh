@@ -89,7 +89,9 @@ check_args()
 }
 
 
-
+#
+#   Performs various checks on the file defined by the $FILE variable - e.g. if the file type is recognized/supported or not
+#
 check_file()
 {
     FILE_EXT=$(echo "${FILE##*.}" |  tr '[:upper:]' '[:lower:]' )
@@ -118,6 +120,17 @@ check_file()
 
 
 
+get_file_metadata()
+{
+    FILE_EXIF_GPS=$(exiftool $FILE | grep "GPS Position")
+    FILE_EXIF_GPS=${FILE_EXIF_GPS/"GPS Position"/}
+    FILE_EXIF_GPS=${FILE_EXIF_GPS/":"/}
+    FILE_EXIF_GPS=$(echo "${FILE_EXIF_GPS}" | sed -e 's/^[[:space:]]*//')
+    echo "  EXIF GPS: "$FILE_EXIF_GPS
+}
+
+
+
 
 
 
@@ -136,6 +149,7 @@ main()
     do
         echo "file: "$FILE
         check_file
+        get_file_metadata
     done
 }
 
