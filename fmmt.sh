@@ -5,9 +5,12 @@
 
 
 
-COL_ERR="\033[0;31m"
-COL_WRN="\033[0;33m"
-COL_DFT="\033[0m"
+COL_ERR="\033[0;31m" # error output 
+COL_WRN="\033[0;33m" # warning output
+COL_DFT="\033[0m" # default output
+WAIT_SHORT=1
+WAIT_LONG=1.5
+
 
 
 
@@ -96,7 +99,7 @@ check_args()
 #
 #   Performs various checks on the file defined by the $FILE variable - e.g. if the file type is recognized/supported or not
 #
-check_file_type()
+get_file_type()
 {
     FILE_EXT=$(echo "${FILE##*.}" |  tr '[:upper:]' '[:lower:]' )
 
@@ -115,11 +118,7 @@ check_file_type()
     ;;
     esac
 
-    if [ -z $FILE_TYPE ]; then
-        echo "  ERROR - "$COL_ERR"file type not recognized!"$COL_DFT
-    else
-        echo "  Type: "$FILE_TYPE
-    fi
+
 }
 
 
@@ -159,20 +158,43 @@ main()
     echo "FAST_OUTPUT:"$FAST_OUTPUT
     echo "DEBUG:"$DEBUG
 
+    #
+    #   TEMPORARY, to be moved into check_file()
+    #
     for FILE in ./*
     do
-        [ -n "$FAST_OUTPUT" ] && sleep 2
+        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_LONG
         echo "\n- File: \""$FILE"\""
-        check_file_type
+        get_file_type
         get_file_metadata
 
-        echo "  - EXIF GPS: "$FILE_EXIF_GPS # TEMPORARY, to be moved into check_file()
-        [ -n "$FAST_OUTPUT" ] && sleep 1
-        echo "  - EXIF Create Time: "$FILE_EXIF_CREATETIME # TEMPORARY, to be moved into check_file()
-        [ -n "$FAST_OUTPUT" ] && sleep 1
 
-        # exiftool $FILE | grep "Create Date"
+        if [ -z $FILE_TYPE ]; then
+            echo "  -> "$COL_ERR"file type not recognized!"$COL_DFT
+        else
+            echo "  -> Type: "$FILE_TYPE
+        fi
+        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+
+        
+        if [ -z $FILE_EXIF_GPS ]; then
+            echo "  -> "$COL_ERR"No GPS Coordinates detected in the file metadata!"$COL_DFT
+        else
+            echo "  -> EXIF GPS: "$FILE_EXIF_GPS
+        fi
+        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+
+
+        if [ -z $FILE_EXIF_CREATETIME ]; then
+            echo "  -> "$COL_ERR"No creation date detected in the file metadata!"$COL_DFT
+        else
+            echo "  -> EXIF Create Time: "$FILE_EXIF_CREATETIME
+        fi
+        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
     done
+
+
+    echo $COL_WRN"test WRN"$COL_DFT
 }
 
 
