@@ -16,8 +16,7 @@ COL_DFT="\033[0m"
 #
 usage()
 {
-	# [ ! -z "$ARG" ] && echo "Unknown option: "$COL_ERR"${ARG%%=*}"$COL_DFT
-	echo "Usage: "$COL_WRN"fmmt [--src_dir=|-sd]=<source_directory> [--tgt_dir=|-td]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co]"$COL_DFT
+	echo "Usage: "$COL_WRN"fmmt [--src_dir=|-sd]=<source_directory> [--tgt_dir=|-td]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co [--fast-output|-fo]"$COL_DFT
 	echo "Bye!"
 	exit 1
 }
@@ -56,6 +55,10 @@ read_args()
             PREFIX="${ARG#*=}"
             [ -z "$PREFIX" ] && usage
             ;;
+
+            -fo|--fast-output)
+            FAST_OUTPUT="y"
+            ;;
             
             *)
             echo "ERROR - unkwnon argument: $COL_ERR"${ARG%%=*}$COL_DFT
@@ -74,8 +77,9 @@ check_args()
     if [ ! -z $DEBUG ]; then
         echo "Arguments:"
         echo " - DEBUG: \"$DEBUG\""
-        echo " - CHECK_ONLY: \"$CHECK_ONLY\""
+        echo " - CHECK_ONLY: \"${CHECK_ONLY:="(empty)"}\""
         echo " - DIR_SRC: \"$DIR_SRC\""
+        echo " - FAST_OUTPUT: \"${FAST_OUTPUT:="(empty)"}\""
         echo " - All: "$ARGS
     fi
 
@@ -130,7 +134,7 @@ get_file_metadata()
     FILE_EXIF_GPS=${FILE_EXIF_GPS/":"/}
     FILE_EXIF_GPS=$(echo "${FILE_EXIF_GPS}" | sed -e 's/^[[:space:]]*//')
 
-    FILE_EXIF_CREATETIME=$(exiftool $FILE | grep "Create Date" | head)
+    FILE_EXIF_CREATETIME=$(exiftool $FILE | grep "Create Date" | head -n 1)
     FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/"Create Date"/}
     FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/":"/}
     FILE_EXIF_CREATETIME=$(echo "${FILE_EXIF_CREATETIME}" | sed -e 's/^[[:space:]]*//')
@@ -154,12 +158,15 @@ main()
 
     for FILE in ./*
     do
+        [ -z "$FAST_OUTPUT" ] && sleep 2
         echo "File: \""$FILE"\""
         check_file_type
         get_file_metadata
 
         echo "  EXIF GPS: "$FILE_EXIF_GPS # TEMPORARY, to be moved into check_file()
+        [ -z "$FAST_OUTPUT" ] && sleep 1
         echo "  EXIF Create Time: "$FILE_EXIF_CREATETIME # TEMPORARY, to be moved into check_file()
+        [ -z "$FAST_OUTPUT" ] && sleep 1
 
         # exiftool $FILE | grep "Create Date"
     done
