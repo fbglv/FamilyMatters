@@ -9,8 +9,8 @@ COL_ERR="\033[0;31m" # error output
 COL_OK="\033[0;32m" # ok output 
 COL_WRN="\033[0;33m" # warning output
 COL_DFT="\033[0m" # default output
-WAIT_SHORT=1
-WAIT_LONG=1.5
+WAIT_SHORT=0.5
+WAIT_LONG=0.75
 
 
 
@@ -98,7 +98,7 @@ check_args()
 
 
 #
-#   Checks if the file type is recognized/supported, based on the file extension
+#   Checks if the file type is recognized/supported based on the file extension, and determines the new file extension
 #
 get_file_type()
 {
@@ -117,6 +117,9 @@ get_file_type()
     ;;
     "mov")
         FILE_TYPE="qtff"
+    ;;
+    *)
+        FILE_TYPE=
     ;;       
     esac
 
@@ -130,6 +133,7 @@ get_file_type()
 #
 get_file_creationtime()
 {
+    FILE_CRTM=
     FILE_CRTM=$(exiftool $FILE | grep "Create Date" | head -n 1)
     FILE_CRTM=${FILE_CRTM/"Create Date"/}
     FILE_CRTM=${FILE_CRTM/":"/}
@@ -143,7 +147,7 @@ get_file_creationtime()
 #
 get_file_gps()
 {
-
+    FILE_GPS=
     FILE_GPS=$(exiftool $FILE | grep "GPS Position")
     FILE_GPS=${FILE_GPS/"GPS Position"/}
     FILE_GPS=${FILE_GPS/":"/}
@@ -152,6 +156,18 @@ get_file_gps()
 
 
 
+#
+#   Generates the new filename, based on the EXIF creation time
+#
+gen_file_name_new()
+{
+    FILE_NAME_NEW_PREFIX=
+    [ ! -z "$PREFIX" ] && FILE_NAME_NEW_PREFIX=$PREFIX"_"
+    
+    if [ ! -z $FILE_CRTM ]; then
+        FILE_NAME_NEW=$FILE_NAME_NEW_PREFIX$(echo "$FILE_CRTM" | tr -d ':' | tr ' ' '_')"."$FILE_EXT_NEW
+    fi
+}
 
 
 
@@ -168,8 +184,6 @@ main()
         exit 1
     fi
 
-    echo "FAST_OUTPUT:"$FAST_OUTPUT
-    echo "DEBUG:"$DEBUG
 
     #
     #   TEMPORARY, to be moved into check_file()
@@ -187,7 +201,8 @@ main()
 
 
         if [ -z $FILE_TYPE ]; then
-            echo "  -> "$COL_ERR"file type not recognized!"$COL_DFT
+            echo "  -> "$COL_ERR"file type not recognized!"$COL_DFT 
+            continue
         else
             echo "  -> Type: "$FILE_TYPE
         fi
@@ -196,24 +211,25 @@ main()
         
         if [ -z $FILE_CRTM ]; then
             echo "  -> "$COL_ERR"No creation date detected within the file metadata!"$COL_DFT
+            continue
         else
-            echo "  -> EXIF Create Time: "$FILE_CRTM
+            echo "  -> EXIF creation time: "$COL_OK$FILE_CRTM$COL_DFT
         fi
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
 
 
         if [ -z $FILE_GPS ]; then
-            echo "  -> "$COL_ERR"No GPS coordinates detected within the file metadata!"$COL_DFT
+            echo "  -> "$COL_WRN"No GPS coordinates detected within the file metadata!"$COL_DFT
         else
-            echo "  -> EXIF GPS: "$FILE_GPS
+            echo "  -> EXIF GPS: "$COL_OK$FILE_GPS$COL_DFT
         fi
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
 
 
-        # echo "  -> File extension new: "$FILE_EXT_NEW
-
+        gen_file_name_new
+        [ ! -z "$FILE_NAME_NEW" ] && echo "  => New filename: "$FILE_NAME_NEW
+        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
     done
-
 }
 
 
