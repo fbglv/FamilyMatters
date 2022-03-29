@@ -20,7 +20,7 @@ WAIT_LONG=0.75
 #
 usage()
 {
-	echo "Usage: "$COL_WRN"fmmt [--src_dir=|-sd]=<source_directory> [--tgt_dir=|-td]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co [--fast-output|-fo]"$COL_DFT
+	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-sd]=<raw_directory> [--tgt_dir=|-td]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co [--fast-output|-fo]"$COL_DFT
 	echo "Bye!"
 	exit 1
 }
@@ -54,9 +54,9 @@ read_args()
             [ -z "$DIR_TGT" ] && usage
             ;;
 
-            -sd=*|--src_dir=*)
-            DIR_SRC="${ARG#*=}"
-            [ -z "$DIR_SRC" ] && usage
+            -rd=*|--raw_dir=*)
+            DIR_RAW="${ARG#*=}"
+            [ -z "$DIR_RAW" ] && usage
             ;;
 
             -p=*|--prefix=*)
@@ -83,15 +83,15 @@ check_args()
         echo " - All: "$ARGS
         if [ -n "$DEBUG" ] && echo " - DEBUG: \"$DEBUG\""
         if [ -n "$CHECK_ONLY" ] && echo " - CHECK_ONLY: \"CHECK_ONLY\""
-        if [ -n "$DIR_SRC" ] && echo " - DIR_SRC: \"$DIR_SRC\""
+        if [ -n "$DIR_RAW" ] && echo " - DIR_RAW: \"$DIR_RAW\""
         if [ -n "$FAST_OUTPUT" ] && echo " - FAST_OUTPUT: \"$FAST_OUTPUT\""
     fi
 
     #
     #   Use case 01: only list the input files without performing any change 
     #   
-    if [ -z $DIR_SRC ] && [ ! -z $CHECK_ONLY ] ; then
-        echo "ERROR - "$COL_ERR"DIR_SRC"$COL_DFT" cannot be null!"
+    if [ -z $DIR_RAW ] && [ ! -z $CHECK_ONLY ] ; then
+        echo "ERROR - "$COL_ERR"DIR_RAW"$COL_DFT" cannot be null!"
         usage
     fi
 }
@@ -176,11 +176,11 @@ gen_file_name_new()
 
 main()
 {  
-    if [ -d "$DIR_SRC" ]
+    if [ -d "$DIR_RAW" ]
     then
-        cd $DIR_SRC
+        cd $DIR_RAW
     else
-        echo $COL_ERR"The \""$DIR_SRC"\" directory does not exists."$COL_DFT" Bye!"
+        echo $COL_ERR"The \""$DIR_RAW"\" directory does not exists."$COL_DFT" Bye!"
         exit 1
     fi
 
