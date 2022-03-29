@@ -107,6 +107,7 @@ get_file_type()
     case $FILE_EXT in
     "jpg")
         FILE_TYPE="jpeg"
+        FILE_EXT_NEW="jpeg"
     ;;
     "jpeg")
         FILE_TYPE="jpeg"
@@ -114,13 +115,12 @@ get_file_type()
     "heic")
         FILE_TYPE="heic"
     ;;
-    "MOV")
-        FILE_TYPE="mov"
-    ;;
     "mov")
-        FILE_TYPE="mov"
+        FILE_TYPE="qtff"
     ;;       
     esac
+
+    if [ -z $FILE_EXT_NEW ] && FILE_EXT_NEW=$FILE_EXT
 }
 
 
@@ -212,6 +212,9 @@ main()
             echo "  -> EXIF GPS: "$FILE_EXIF_GPS
         fi
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+
+
+        # echo "  -> File extension new: "$FILE_EXT_NEW
 
     done
 
