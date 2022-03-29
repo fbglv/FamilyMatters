@@ -20,7 +20,7 @@ WAIT_LONG=0.75
 #
 usage()
 {
-	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-sd]=<raw_directory> [--tgt_dir=|-td]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co [--fast-output|-fo]"$COL_DFT
+	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-sd]=<raw_directory> [--proc_dir=|-pd]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co]"$COL_DFT
 	echo "Bye!"
 	exit 1
 }
@@ -45,13 +45,9 @@ read_args()
             CHECK_ONLY="y"
             ;;
 
-            -fo|--fast-output)
-            FAST_OUTPUT="y"
-            ;;
-
-            -td=*|--tgt_dir=*)
-            DIR_TGT="${ARG#*=}"
-            [ -z "$DIR_TGT" ] && usage
+            -pd=*|--proc_dir=*)
+            DIR_PROC="${ARG#*=}"
+            [ -z "$DIR_PROC" ] && usage
             ;;
 
             -rd=*|--raw_dir=*)
@@ -78,12 +74,13 @@ read_args()
 #
 check_args()
 {
-    if [ ! -z $DEBUG ]; then
+    if [ $DEBUG ]; then
         echo "Arguments:"
         echo " - All: "$ARGS
         if [ -n "$DEBUG" ] && echo " - DEBUG: \"$DEBUG\""
         if [ -n "$CHECK_ONLY" ] && echo " - CHECK_ONLY: \"CHECK_ONLY\""
         if [ -n "$DIR_RAW" ] && echo " - DIR_RAW: \"$DIR_RAW\""
+        if [ -n "$DIR_PROC" ] && echo " - DIR_PROC: \"$DIR_PROC\""
         if [ -n "$FAST_OUTPUT" ] && echo " - FAST_OUTPUT: \"$FAST_OUTPUT\""
     fi
 
@@ -103,6 +100,7 @@ check_args()
 get_file_type()
 {
     FILE_EXT=$(echo "${FILE##*.}" |  tr '[:upper:]' '[:lower:]' )
+    FILE_EXT_NEW=
 
     case $FILE_EXT in
     "jpg")
@@ -117,6 +115,9 @@ get_file_type()
     ;;
     "mov")
         FILE_TYPE="qtff"
+    ;;
+    "mp4")
+        FILE_TYPE="mp4"    
     ;;
     *)
         FILE_TYPE=
@@ -138,6 +139,10 @@ get_file_creationtime()
     FILE_CRTM=${FILE_CRTM/"Create Date"/}
     FILE_CRTM=${FILE_CRTM/":"/}
     FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//')
+
+    if [ $FILE_CRTM = "0000:00:00 00:00:00" ]; then
+        FILE_CRTM=
+    fi
 }
 
 
@@ -185,20 +190,17 @@ main()
     fi
 
 
-    #
-    #   TEMPORARY, to be moved into check_file()
-    #
+
     for FILE in ./*
     do
         FILE_NAME=${FILE/".\/"/} 
 
-        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_LONG
+        [ $DEBUG ] && sleep $WAIT_LONG
         echo "\n- File: \""$FILE_NAME"\""
         get_file_type
         get_file_creationtime
         get_file_gps
         
-
 
         if [ -z $FILE_TYPE ]; then
             echo "  -> "$COL_ERR"File type not recognized!"$COL_DFT 
@@ -206,7 +208,7 @@ main()
         else
             echo "  -> Type: "$FILE_TYPE
         fi
-        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+        [ $DEBUG ] && sleep $WAIT_SHORT
 
         
         if [ -z $FILE_CRTM ]; then
@@ -215,7 +217,7 @@ main()
         else
             echo "  -> EXIF creation time: "$COL_OK$FILE_CRTM$COL_DFT
         fi
-        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+        [ $DEBUG ] && sleep $WAIT_SHORT
 
 
         if [ -z $FILE_GPS ]; then
@@ -223,12 +225,18 @@ main()
         else
             echo "  -> EXIF GPS: "$COL_OK$FILE_GPS$COL_DFT
         fi
-        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+        [ $DEBUG ] && sleep $WAIT_SHORT
 
 
         gen_file_name_new
-        [ "$FILE_NAME_NEW" ] && echo "  => New filename: "$FILE_NAME_NEW
-        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+        [ "$FILE_NAME_NEW" ] && echo "  => New filename: \""$FILE_NAME_NEW"\""
+        [ $DEBUG ] && sleep $WAIT_SHORT
+
+
+        [ -z "$DIR_PROC" ] && DIR_PROC=$DIR_RAW
+        if [ -z $CHECK_ONLY ]; then
+            cp -f $FILE $DIR_PROC$FILE_NAME_NEW
+        fi
     done
 }
 
