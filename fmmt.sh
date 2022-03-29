@@ -128,30 +128,26 @@ get_file_type()
 #
 #   Retrieves the creation date from the file EXIF metadata
 #
-get_file_metadata_createtime()
+get_file_creationtime()
 {
-    FILE_EXIF_CREATETIME=$(exiftool $FILE | grep "Create Date" | head -n 1)
-    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/"Create Date"/}
-    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/":"/}
-    FILE_EXIF_CREATETIME=$(echo "${FILE_EXIF_CREATETIME}" | sed -e 's/^[[:space:]]*//')
+    FILE_CRTM=$(exiftool $FILE | grep "Create Date" | head -n 1)
+    FILE_CRTM=${FILE_CRTM/"Create Date"/}
+    FILE_CRTM=${FILE_CRTM/":"/}
+    FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//')
 }
+
 
 
 #
 #   Retrieves the GPS coordinates from the file EXIF metadata
 #
-get_file_metadata_gps()
+get_file_gps()
 {
 
-    FILE_EXIF_GPS=$(exiftool $FILE | grep "GPS Position")
-    FILE_EXIF_GPS=${FILE_EXIF_GPS/"GPS Position"/}
-    FILE_EXIF_GPS=${FILE_EXIF_GPS/":"/}
-    FILE_EXIF_GPS=$(echo "${FILE_EXIF_GPS}" | sed -e 's/^[[:space:]]*//')
-
-    FILE_EXIF_CREATETIME=$(exiftool $FILE | grep "Create Date" | head -n 1)
-    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/"Create Date"/}
-    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/":"/}
-    FILE_EXIF_CREATETIME=$(echo "${FILE_EXIF_CREATETIME}" | sed -e 's/^[[:space:]]*//')
+    FILE_GPS=$(exiftool $FILE | grep "GPS Position")
+    FILE_GPS=${FILE_GPS/"GPS Position"/}
+    FILE_GPS=${FILE_GPS/":"/}
+    FILE_GPS=$(echo "${FILE_GPS}" | sed -e 's/^[[:space:]]*//')
 }
 
 
@@ -185,8 +181,8 @@ main()
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_LONG
         echo "\n- File: \""$FILE_NAME"\""
         get_file_type
-        get_file_metadata_createtime
-        get_file_metadata_gps
+        get_file_creationtime
+        get_file_gps
         
 
 
@@ -198,18 +194,18 @@ main()
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
 
         
-        if [ -z $FILE_EXIF_CREATETIME ]; then
-            echo "  -> "$COL_ERR"No creation date detected in the file metadata!"$COL_DFT
+        if [ -z $FILE_CRTM ]; then
+            echo "  -> "$COL_ERR"No creation date detected within the file metadata!"$COL_DFT
         else
-            echo "  -> EXIF Create Time: "$FILE_EXIF_CREATETIME
+            echo "  -> EXIF Create Time: "$FILE_CRTM
         fi
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
 
 
-        if [ -z $FILE_EXIF_GPS ]; then
-            echo "  -> "$COL_ERR"No GPS Coordinates detected in the file metadata!"$COL_DFT
+        if [ -z $FILE_GPS ]; then
+            echo "  -> "$COL_ERR"No GPS coordinates detected within the file metadata!"$COL_DFT
         else
-            echo "  -> EXIF GPS: "$FILE_EXIF_GPS
+            echo "  -> EXIF GPS: "$FILE_GPS
         fi
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
 
