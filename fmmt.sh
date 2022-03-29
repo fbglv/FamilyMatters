@@ -162,9 +162,9 @@ get_file_gps()
 gen_file_name_new()
 {
     FILE_NAME_NEW_PREFIX=
-    [ ! -z "$PREFIX" ] && FILE_NAME_NEW_PREFIX=$PREFIX"_"
+    [ "$PREFIX" ] && FILE_NAME_NEW_PREFIX=$PREFIX"_"
     
-    if [ ! -z $FILE_CRTM ]; then
+    if [ $FILE_CRTM ]; then
         FILE_NAME_NEW=$FILE_NAME_NEW_PREFIX$(echo "$FILE_CRTM" | tr -d ':' | tr ' ' '_')"."$FILE_EXT_NEW
     fi
 }
@@ -201,7 +201,7 @@ main()
 
 
         if [ -z $FILE_TYPE ]; then
-            echo "  -> "$COL_ERR"file type not recognized!"$COL_DFT 
+            echo "  -> "$COL_ERR"File type not recognized!"$COL_DFT 
             continue
         else
             echo "  -> Type: "$FILE_TYPE
@@ -227,7 +227,7 @@ main()
 
 
         gen_file_name_new
-        [ ! -z "$FILE_NAME_NEW" ] && echo "  => New filename: "$FILE_NAME_NEW
+        [ "$FILE_NAME_NEW" ] && echo "  => New filename: "$FILE_NAME_NEW
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
     done
 }
