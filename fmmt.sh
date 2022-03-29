@@ -5,7 +5,8 @@
 
 
 
-COL_ERR="\033[0;31m" # error output 
+COL_ERR="\033[0;31m" # error output
+COL_OK="\033[0;32m" # ok output 
 COL_WRN="\033[0;33m" # warning output
 COL_DFT="\033[0m" # default output
 WAIT_SHORT=1
@@ -141,6 +142,36 @@ get_file_metadata()
 
 
 
+#
+#   Retrieves the GPS coordinates from the file EXIF metadata
+#
+get_file_metadata_gps()
+{
+
+    FILE_EXIF_GPS=$(exiftool $FILE | grep "GPS Position")
+    FILE_EXIF_GPS=${FILE_EXIF_GPS/"GPS Position"/}
+    FILE_EXIF_GPS=${FILE_EXIF_GPS/":"/}
+    FILE_EXIF_GPS=$(echo "${FILE_EXIF_GPS}" | sed -e 's/^[[:space:]]*//')
+
+    FILE_EXIF_CREATETIME=$(exiftool $FILE | grep "Create Date" | head -n 1)
+    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/"Create Date"/}
+    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/":"/}
+    FILE_EXIF_CREATETIME=$(echo "${FILE_EXIF_CREATETIME}" | sed -e 's/^[[:space:]]*//')
+}
+
+
+#
+#   Retrieves the creation date from the file EXIF metadata
+#
+get_file_metadata_createtime()
+{
+    FILE_EXIF_CREATETIME=$(exiftool $FILE | grep "Create Date" | head -n 1)
+    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/"Create Date"/}
+    FILE_EXIF_CREATETIME=${FILE_EXIF_CREATETIME/":"/}
+    FILE_EXIF_CREATETIME=$(echo "${FILE_EXIF_CREATETIME}" | sed -e 's/^[[:space:]]*//')
+}
+
+
 
 
 
@@ -166,7 +197,9 @@ main()
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_LONG
         echo "\n- File: \""$FILE"\""
         get_file_type
-        get_file_metadata
+        get_file_metadata_createtime
+        get_file_metadata_gps
+        
 
 
         if [ -z $FILE_TYPE ]; then
@@ -177,6 +210,14 @@ main()
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
 
         
+        if [ -z $FILE_EXIF_CREATETIME ]; then
+            echo "  -> "$COL_ERR"No creation date detected in the file metadata!"$COL_DFT
+        else
+            echo "  -> EXIF Create Time: "$FILE_EXIF_CREATETIME
+        fi
+        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
+
+
         if [ -z $FILE_EXIF_GPS ]; then
             echo "  -> "$COL_ERR"No GPS Coordinates detected in the file metadata!"$COL_DFT
         else
@@ -184,17 +225,8 @@ main()
         fi
         [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
 
-
-        if [ -z $FILE_EXIF_CREATETIME ]; then
-            echo "  -> "$COL_ERR"No creation date detected in the file metadata!"$COL_DFT
-        else
-            echo "  -> EXIF Create Time: "$FILE_EXIF_CREATETIME
-        fi
-        [ -z "$FAST_OUTPUT" ] && sleep $WAIT_SHORT
     done
 
-
-    echo $COL_WRN"test WRN"$COL_DFT
 }
 
 
