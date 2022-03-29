@@ -98,15 +98,12 @@ check_args()
 
 
 #
-#   Performs various checks on the file defined by the $FILE variable - e.g. if the file type is recognized/supported or not
+#   Checks if the file type is recognized/supported, based on the file extension
 #
 get_file_type()
 {
     FILE_EXT=$(echo "${FILE##*.}" |  tr '[:upper:]' '[:lower:]' )
 
-    #
-    #   Checks the file type based on the file extensions
-    #
     case $FILE_EXT in
     "jpg")
         FILE_TYPE="jpeg"
@@ -118,8 +115,6 @@ get_file_type()
         FILE_TYPE="jpeg"
     ;;
     esac
-
-
 }
 
 
