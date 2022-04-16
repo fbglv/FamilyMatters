@@ -20,7 +20,7 @@ WAIT_LONG=0.75
 #
 usage()
 {
-	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-sd]=<raw_directory> [--proc_dir=|-pd]=<target_directory> [--prefix=|-p]=<prefix> [--check-only|-co]"$COL_DFT
+	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-sd]=<raw_directory> [--proc_dir=|-pd]=<proc_directory> [--prefix=|-p]=<prefix> [--check-only|-co]"$COL_DFT
 	echo "Bye!"
 	exit 1
 }
@@ -45,14 +45,14 @@ read_args()
             CHECK_ONLY="y"
             ;;
 
-            -pd=*|--proc_dir=*)
-            DIR_PROC="${ARG#*=}"
-            [ -z "$DIR_PROC" ] && usage
-            ;;
-
             -rd=*|--raw_dir=*)
             DIR_RAW="${ARG#*=}"
             [ -z "$DIR_RAW" ] && usage
+            ;;
+            
+            -pd=*|--proc_dir=*)
+            DIR_PROC="${ARG#*=}"
+            [ -z "$DIR_PROC" ] && usage
             ;;
 
             -p=*|--prefix=*)
@@ -233,9 +233,12 @@ main()
         [ $DEBUG ] && sleep $WAIT_SHORT
 
 
+        #
+        #   Performs the actual moving/copying of the files
+        #
         [ -z "$DIR_PROC" ] && DIR_PROC=$DIR_RAW
         if [ -z $CHECK_ONLY ]; then
-            cp -f $FILE $DIR_PROC$FILE_NAME_NEW
+             cp -f $FILE $DIR_PROC$FILE_NAME_NEW
         fi
     done
 }
