@@ -140,7 +140,8 @@ get_file_creationtime()
     FILE_CRTM=${FILE_CRTM/":"/}
     FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//')
 
-    if [ $FILE_CRTM = "0000:00:00 00:00:00" ]; then
+    if [ "$FILE_CRTM" = "0000:00:00 00:00:00" ]; then
+        echo "weird condition" # DEBUG
         FILE_CRTM=
     fi
 }
@@ -190,46 +191,65 @@ main()
     fi
 
 
-
+    echo "\n"
     for FILE in ./*
     do
         FILE_NAME=${FILE/".\/"/} 
 
         [ $DEBUG ] && sleep $WAIT_LONG
-        echo "\n- File: \""$FILE_NAME"\""
+        
+        echo ""
+        # echo "qui" # DEBUG
+        FILE_STATUS="- \""$FILE_NAME"\""
+        echo -ne "$FILE_STATUS\r"
+        FILE_STATUS_TMP=$FILE_STATUS
+        
+
         get_file_type
-        get_file_creationtime
-        get_file_gps
-        
-
+        echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_TYPE ]; then
-            echo "  -> "$COL_ERR"File type not recognized!"$COL_DFT 
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Unknown file type!"$COL_DFT
+            echo -ne "$FILE_STATUS_TMP\r"
             continue
         else
-            echo "  -> Type: "$FILE_TYPE
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"File type recognized"$COL_DFT
+            [ $DEBUG ] && echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $DEBUG ] && sleep $WAIT_SHORT
 
-        
+        get_file_creationtime
+        # FILE_STATUS=$FILE_STATUS" | "
+        FILE_STATUS_TMP=$FILE_STATUS
+        echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_CRTM ]; then
-            echo "  -> "$COL_ERR"No creation date detected within the file metadata!"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Creation not detected!"$COL_DFT
+            echo -ne "$FILE_STATUS_TMP\r"
             continue
         else
-            echo "  -> EXIF creation time: "$COL_OK$FILE_CRTM$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"Creation Time detected"$COL_DFT
+            echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $DEBUG ] && sleep $WAIT_SHORT
 
-
+        get_file_gps
+        # FILE_STATUS=$FILE_STATUS" | "
+        FILE_STATUS_TMP=$FILE_STATUS
+        echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_GPS ]; then
-            echo "  -> "$COL_WRN"No GPS coordinates detected within the file metadata!"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"GPS not detected!"$COL_DFT
+            echo -ne "$FILE_STATUS_TMP\r"
+            continue
         else
-            echo "  -> EXIF GPS: "$COL_OK$FILE_GPS$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"GPS detected"$COL_DFT
+            echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $DEBUG ] && sleep $WAIT_SHORT
 
 
         gen_file_name_new
-        [ "$FILE_NAME_NEW" ] && echo "  => New filename: \""$FILE_NAME_NEW"\""
+        FILE_STATUS_TMP=$FILE_STATUS
+        [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: \""$FILE_NAME_NEW"\""; echo -ne "$FILE_STATUS_TMP\r"
+        # [ "$FILE_NAME_NEW" ] && echo "  => New filename: \""$FILE_NAME_NEW"\""
         [ $DEBUG ] && sleep $WAIT_SHORT
 
 
