@@ -222,11 +222,11 @@ main()
         FILE_STATUS_TMP=$FILE_STATUS
         echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_CRTM ]; then
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Creation not detected!"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Creation time not detected!"$COL_DFT
             echo -ne "$FILE_STATUS_TMP\r"
             continue
         else
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"Creation Time detected"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"Creation time detected"$COL_DFT
             echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $DEBUG ] && sleep $WAIT_SHORT
