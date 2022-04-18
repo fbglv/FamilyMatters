@@ -20,7 +20,7 @@ WAIT_LONG=0.75
 #
 usage()
 {
-	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-sd]=<raw_directory> [--proc_dir=|-pd]=<proc_directory> [--prefix=|-p]=<prefix> [--check-only|-co]"$COL_DFT
+	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-rd]=<raw_directory> [--proc_dir=|-pd]=<proc_directory> [--prefix=|-p]=<prefix> [--check-only|-co] [--slow|-s]"$COL_DFT
 	echo "Bye!"
 	exit 1
 }
@@ -43,6 +43,10 @@ read_args()
             
             -co|--check-only)
             CHECK_ONLY="y"
+            ;;
+
+            -s|--slow)
+            SLOW="y"
             ;;
 
             -rd=*|--raw_dir=*)
@@ -81,7 +85,7 @@ check_args()
         if [ -n "$CHECK_ONLY" ] && echo " - CHECK_ONLY: \"CHECK_ONLY\""
         if [ -n "$DIR_RAW" ] && echo " - DIR_RAW: \"$DIR_RAW\""
         if [ -n "$DIR_PROC" ] && echo " - DIR_PROC: \"$DIR_PROC\""
-        if [ -n "$FAST_OUTPUT" ] && echo " - FAST_OUTPUT: \"$FAST_OUTPUT\""
+        if [ -n "$SLOW" ] && echo " - SLOW: \"$SLOW\""
     fi
 
     #
@@ -196,7 +200,7 @@ main()
     do
         FILE_NAME=${FILE/".\/"/} 
 
-        [ $DEBUG ] && sleep $WAIT_LONG
+        [ $SLOW ] && sleep $WAIT_LONG
         
         echo ""
         # echo "qui" # DEBUG
@@ -215,7 +219,7 @@ main()
             FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"File type recognized"$COL_DFT
             [ $DEBUG ] && echo -ne "$FILE_STATUS_TMP\r"
         fi
-        [ $DEBUG ] && sleep $WAIT_SHORT
+        [ $SLOW ] && sleep $WAIT_SHORT
 
         get_file_creationtime
         # FILE_STATUS=$FILE_STATUS" | "
@@ -229,7 +233,7 @@ main()
             FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"Creation time detected"$COL_DFT
             echo -ne "$FILE_STATUS_TMP\r"
         fi
-        [ $DEBUG ] && sleep $WAIT_SHORT
+        [ $SLOW ] && sleep $WAIT_SHORT
 
         get_file_gps
         # FILE_STATUS=$FILE_STATUS" | "
@@ -243,14 +247,14 @@ main()
             FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"GPS detected"$COL_DFT
             echo -ne "$FILE_STATUS_TMP\r"
         fi
-        [ $DEBUG ] && sleep $WAIT_SHORT
+        [ $SLOW ] && sleep $WAIT_SHORT
 
 
         gen_file_name_new
         FILE_STATUS_TMP=$FILE_STATUS
         [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: \""$FILE_NAME_NEW"\""; echo -ne "$FILE_STATUS_TMP\r"
         # [ "$FILE_NAME_NEW" ] && echo "  => New filename: \""$FILE_NAME_NEW"\""
-        [ $DEBUG ] && sleep $WAIT_SHORT
+        [ $SLOW ] && sleep $WAIT_SHORT
 
 
         #
