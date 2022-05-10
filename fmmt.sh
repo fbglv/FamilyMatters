@@ -11,6 +11,7 @@ COL_WRN="\033[0;33m" # warning output
 COL_DFT="\033[0m" # default output
 WAIT_SHORT=0.5
 WAIT_LONG=0.75
+BLANK_LONG="                                                        "
 
 
 
@@ -203,7 +204,6 @@ main()
         [ $SLOW ] && sleep $WAIT_LONG
         
         echo ""
-        # echo "qui" # DEBUG
         FILE_STATUS="- \""$FILE_NAME"\""
         echo -ne "$FILE_STATUS\r"
         FILE_STATUS_TMP=$FILE_STATUS
@@ -212,11 +212,11 @@ main()
         get_file_type
         echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_TYPE ]; then
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Unknown file type!"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Unknown file type!"$COL_DFT$BLANK_LONG
             echo -ne "$FILE_STATUS_TMP\r"
             continue
         else
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"File type recognized"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"File type recognized"$COL_DFT$BLANK_LONG
             [ $DEBUG ] && echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $SLOW ] && sleep $WAIT_SHORT
@@ -226,34 +226,32 @@ main()
         FILE_STATUS_TMP=$FILE_STATUS
         echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_CRTM ]; then
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Creation time not detected!"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"Creation time not detected!"$COL_DFT$BLANK_LONG
             echo -ne "$FILE_STATUS_TMP\r"
             continue
         else
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"Creation time detected"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"Creation time detected"$COL_DFT$BLANK_LONG
             echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $SLOW ] && sleep $WAIT_SHORT
 
         get_file_gps
-        # FILE_STATUS=$FILE_STATUS" | "
         FILE_STATUS_TMP=$FILE_STATUS
         echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_GPS ]; then
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"GPS not detected!"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_ERR"GPS not detected!"$COL_DFT$BLANK_LONG
             echo -ne "$FILE_STATUS_TMP\r"
             continue
         else
-            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"GPS detected"$COL_DFT
+            FILE_STATUS_TMP=$FILE_STATUS" "$COL_OK"GPS detected"$COL_DFT$BLANK_LONG
             echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $SLOW ] && sleep $WAIT_SHORT
 
 
         gen_file_name_new
-        FILE_STATUS_TMP=$FILE_STATUS
+        FILE_STATUS_TMP=$FILE_STATUS$BLANK_LONG
         [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: \""$FILE_NAME_NEW"\""; echo -ne "$FILE_STATUS_TMP\r"
-        # [ "$FILE_NAME_NEW" ] && echo "  => New filename: \""$FILE_NAME_NEW"\""
         [ $SLOW ] && sleep $WAIT_SHORT
 
 
