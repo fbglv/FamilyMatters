@@ -270,7 +270,16 @@ main()
         #
         [ -z "$DIR_PROC" ] && DIR_PROC=$DIR_RAW
         if [ -z $CHECK_ONLY ]; then
-             cp -f $FILE $DIR_PROC$FILE_NAME_NEW
+            cp -f $FILE $DIR_PROC$FILE_NAME_NEW
+        fi
+
+
+        #
+        #   Changes the creation / last modified date file attributes
+        #
+        FILE_CRTM_FS=$(echo "${FILE_CRTM}" | sed -e 's/://' | sed -e 's/://' | sed -e 's/://' | sed -e 's/:/./' | sed -e 's/[[:space:]]//')
+        if [ -z $CHECK_ONLY ]; then
+            touch -a -m -t $FILE_CRTM_FS $DIR_PROC$FILE_NAME_NEW
         fi
     done
 }
