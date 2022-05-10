@@ -262,7 +262,7 @@ main()
         #
         gen_file_name_new
         FILE_STATUS_TMP=$FILE_STATUS$BLANK_LONG
-        [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: \""$FILE_NAME_NEW"\""; echo -ne "$FILE_STATUS_TMP\r"
+        [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: "\"$COL_OK$FILE_NAME_NEW$COL_DFT"\""; echo -ne "$FILE_STATUS_TMP\r"
         [ $SLOW ] && sleep $WAIT_SHORT
 
         #
