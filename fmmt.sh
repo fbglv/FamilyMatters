@@ -146,7 +146,6 @@ get_file_creationtime()
     FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//')
 
     if [ "$FILE_CRTM" = "0000:00:00 00:00:00" ]; then
-        echo "weird condition" # DEBUG
         FILE_CRTM=
     fi
 }
@@ -209,6 +208,9 @@ main()
         FILE_STATUS_TMP=$FILE_STATUS
         
 
+        #
+        #   Checks the file type
+        #
         get_file_type
         echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_TYPE ]; then
@@ -221,8 +223,10 @@ main()
         fi
         [ $SLOW ] && sleep $WAIT_SHORT
 
+        #
+        #   Checks the file creation timestamp
+        #
         get_file_creationtime
-        # FILE_STATUS=$FILE_STATUS" | "
         FILE_STATUS_TMP=$FILE_STATUS
         echo -ne "$FILE_STATUS\r"
         if [ -z $FILE_CRTM ]; then
@@ -235,6 +239,10 @@ main()
         fi
         [ $SLOW ] && sleep $WAIT_SHORT
 
+
+        #
+        #   Checks the file GPS coordinates
+        #   
         get_file_gps
         FILE_STATUS_TMP=$FILE_STATUS
         echo -ne "$FILE_STATUS\r"
@@ -249,11 +257,13 @@ main()
         [ $SLOW ] && sleep $WAIT_SHORT
 
 
+        #
+        #   Generates the new filename
+        #
         gen_file_name_new
         FILE_STATUS_TMP=$FILE_STATUS$BLANK_LONG
         [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: \""$FILE_NAME_NEW"\""; echo -ne "$FILE_STATUS_TMP\r"
         [ $SLOW ] && sleep $WAIT_SHORT
-
 
         #
         #   Performs the actual moving/copying of the files
