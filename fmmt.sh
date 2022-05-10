@@ -198,7 +198,11 @@ main()
     echo "\n"
     for FILE in ./*
     do
-        FILE_NAME=${FILE/".\/"/} 
+        # skips if it's a directory
+        [ -d "$FILE" ] && continue;
+        
+
+        FILE_NAME=${FILE/".\/"/}
 
         [ $SLOW ] && sleep $WAIT_LONG
         
