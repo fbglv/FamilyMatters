@@ -84,9 +84,9 @@ check_args()
         echo " - All: "$ARGS
         if [ -n "$DEBUG" ] && echo " - DEBUG: \"$DEBUG\""
         if [ -n "$CHECK_ONLY" ] && echo " - CHECK_ONLY: \"CHECK_ONLY\""
+        if [ -n "$SLOW" ] && echo " - SLOW: \"$SLOW\""
         if [ -n "$DIR_RAW" ] && echo " - DIR_RAW: \"$DIR_RAW\""
         if [ -n "$DIR_PROC" ] && echo " - DIR_PROC: \"$DIR_PROC\""
-        if [ -n "$SLOW" ] && echo " - SLOW: \"$SLOW\""
     fi
 
     #
