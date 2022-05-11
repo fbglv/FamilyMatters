@@ -21,7 +21,7 @@ BLANK_LONG="                                                        "
 #
 usage()
 {
-	echo "Usage: "$COL_WRN"fmmt [--raw_dir=|-rd]=<raw_directory> [--proc_dir=|-pd]=<proc_directory> [--prefix=|-p]=<prefix> [--check-only|-co] [--slow|-s]"$COL_DFT
+	echo "Usage: "$COL_WRN"fmmt [--raw_dir|-rd]=<raw_directory> [--proc_dir|-pd]=<proc_directory> [--move_behavior|-mb]=<move|copy> [--prefix|-p]=<prefix> [--check-only|-co] [--slow|-s]"$COL_DFT
 	echo "Bye!"
 	exit 1
 }
@@ -50,6 +50,13 @@ read_args()
             SLOW="y"
             ;;
 
+            -mb=*|--move_behavior=*)
+            MVBVH="${ARG#*=}"
+            if [[ ! "$MVBVH" == "move" ]] && [[ ! "$MVBVH" == "copy" ]]; then
+                usage
+            fi
+            ;;
+
             -rd=*|--raw_dir=*)
             DIR_RAW="${ARG#*=}"
             [ -z "$DIR_RAW" ] && usage
@@ -67,6 +74,7 @@ read_args()
 
             *)
             echo "ERROR - unkwnon argument: $COL_ERR"${ARG%%=*}$COL_DFT
+            usage
             ;;
         esac
     done
@@ -85,6 +93,7 @@ check_args()
         if [ -n "$DEBUG" ] && echo " - DEBUG: \"$DEBUG\""
         if [ -n "$CHECK_ONLY" ] && echo " - CHECK_ONLY: \"CHECK_ONLY\""
         if [ -n "$SLOW" ] && echo " - SLOW: \"$SLOW\""
+        if [ -z "$MVBVH" ] && MVBVH="move"; echo " - MVBVH: \"$MVBVH\""
         if [ -n "$DIR_RAW" ] && echo " - DIR_RAW: \"$DIR_RAW\""
         if [ -n "$DIR_PROC" ] && echo " - DIR_PROC: \"$DIR_PROC\""
     fi
@@ -266,7 +275,7 @@ main()
         #
         gen_file_name_new
         FILE_STATUS_TMP=$FILE_STATUS$BLANK_LONG
-        [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: "\"$COL_OK$FILE_NAME_NEW$COL_DFT"\""; echo -ne "$FILE_STATUS_TMP\r"
+        [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: "$COL_OK$FILE_NAME_NEW$COL_DFT""; echo -ne "$FILE_STATUS_TMP\r"
         [ $SLOW ] && sleep $WAIT_SHORT
 
         #
@@ -274,9 +283,15 @@ main()
         #
         [ -z "$DIR_PROC" ] && DIR_PROC=$DIR_RAW
         if [ -z $CHECK_ONLY ]; then
-            cp -f $FILE $DIR_PROC$FILE_NAME_NEW
+            case $MVBVH in
+                "move")
+                mv -f $FILE $DIR_PROC$FILE_NAME_NEW
+                ;;
+                "copy")
+                cp -f $FILE $DIR_PROC$FILE_NAME_NEW
+                ;;
+            esac
         fi
-
 
         #
         #   Changes the creation / last modified date file attributes
