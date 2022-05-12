@@ -149,7 +149,7 @@ get_file_type()
 get_file_creationtime()
 {
     FILE_CRTM=
-    FILE_CRTM=$(exiftool $FILE | grep "Create Date" | head -n 1)
+    FILE_CRTM=$(exiftool $FILE | grep -E "^Create Date" | head -n 1)
     FILE_CRTM=${FILE_CRTM/"Create Date"/}
     FILE_CRTM=${FILE_CRTM/":"/}
     FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//')
