@@ -78,6 +78,12 @@ read_args()
             ;;
         esac
     done
+
+
+    #
+    #   Default values
+    #
+    [ -z "$MVBVH" ] && MVBVH="move"
 }
 
 
@@ -93,7 +99,7 @@ check_args()
         if [ -n "$DEBUG" ] && echo " - DEBUG: \"$DEBUG\""
         if [ -n "$CHECK_ONLY" ] && echo " - CHECK_ONLY: \"CHECK_ONLY\""
         if [ -n "$SLOW" ] && echo " - SLOW: \"$SLOW\""
-        if [ -z "$MVBVH" ] && MVBVH="move"; echo " - MVBVH: \"$MVBVH\""
+        if [ -n "$MVBVH" ] && echo " - MVBVH: \"$MVBVH\""
         if [ -n "$DIR_RAW" ] && echo " - DIR_RAW: \"$DIR_RAW\""
         if [ -n "$DIR_PROC" ] && echo " - DIR_PROC: \"$DIR_PROC\""
     fi
@@ -204,7 +210,7 @@ main()
     fi
 
 
-    echo "\n"
+    FL_CNT=0
     for FILE in ./*
     do
         # skips if it's a directory
@@ -275,7 +281,7 @@ main()
         #
         gen_file_name_new
         FILE_STATUS_TMP=$FILE_STATUS$BLANK_LONG
-        [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> New filename: "$COL_OK$FILE_NAME_NEW$COL_DFT""; echo -ne "$FILE_STATUS_TMP\r"
+        [ "$FILE_NAME_NEW" ] && FILE_STATUS_TMP=$FILE_STATUS" ==> "$COL_OK$FILE_NAME_NEW$COL_DFT""; echo -ne "$FILE_STATUS_TMP\r"
         [ $SLOW ] && sleep $WAIT_SHORT
 
         #
@@ -286,9 +292,11 @@ main()
             case $MVBVH in
                 "move")
                 mv -f $FILE $DIR_PROC$FILE_NAME_NEW
+                FL_CNT=$(expr $FL_CNT + 1)
                 ;;
                 "copy")
                 cp -f $FILE $DIR_PROC$FILE_NAME_NEW
+                FL_CNT=$(expr $FL_CNT + 1)
                 ;;
             esac
         fi
@@ -301,6 +309,8 @@ main()
             touch -a -m -t $FILE_CRTM_FS $DIR_PROC$FILE_NAME_NEW
         fi
     done
+
+    echo "\n"$FL_CNT" files have been processed."
 }
 
 
