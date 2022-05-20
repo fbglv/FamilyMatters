@@ -199,7 +199,7 @@ main()
     then
         cd $DIR_RAW
     else
-        echo $COL_ERR"The \""$DIR_RAW"\" directory does not exists."$COL_DFT" Bye!"
+        echo $COL_ERR"The \""$DIR_RAW"\" directory does not exist."$COL_DFT" Bye!"
         exit 1
     fi
 
