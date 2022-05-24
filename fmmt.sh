@@ -211,6 +211,7 @@ main()
 
 
     FL_CNT=0
+    FL_PROC_CNT=0
     for FILE in ./*
     do
         # skips if it's a directory
@@ -221,11 +222,12 @@ main()
 
         [ $SLOW ] && sleep $WAIT_LONG
         
-        echo ""
+        [ ! "$FL_CNT" -eq 0 ] && echo ""
         FILE_STATUS="- \""$FILE_NAME"\""
         echo -ne "$FILE_STATUS\r"
         FILE_STATUS_TMP=$FILE_STATUS
-        
+        FL_CNT=$(expr $FL_CNT + 1)
+
 
         #
         #   Checks the file type
@@ -292,11 +294,11 @@ main()
             case $MVBVH in
                 "move")
                 mv -f $FILE $DIR_PROC$FILE_NAME_NEW
-                FL_CNT=$(expr $FL_CNT + 1)
+                FL_PROC_CNT=$(expr $FL_PROC_CNT + 1)
                 ;;
                 "copy")
                 cp -f $FILE $DIR_PROC$FILE_NAME_NEW
-                FL_CNT=$(expr $FL_CNT + 1)
+                FL_PROC_CNT=$(expr $FL_PROC_CNT + 1)
                 ;;
             esac
         fi
@@ -310,7 +312,8 @@ main()
         fi
     done
 
-    echo "\n"$FL_CNT" files have been processed."
+    echo "\n"$FL_CNT" files have been analyzed."
+    echo $FL_PROC_CNT" files have been processed."
 }
 
 
