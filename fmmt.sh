@@ -160,7 +160,8 @@ get_file_creationtime()
     FILE_CRTM=${FILE_CRTM/":"/}
     FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//')
 
-    if [ "$FILE_CRTM" = "0000:00:00 00:00:00" ]; then
+    # checks if the creation date is null
+    if [[ "$FILE_CRTM" == *"0000:00:00"* ]]; then
         FILE_CRTM=
     fi
 }
