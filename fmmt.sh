@@ -157,11 +157,12 @@ get_file_creationtime()
     FILE_CRTM=
     FILE_CRTM=$(exiftool $FILE | grep -E "^Create Date" | head -n 1)
     FILE_CRTM=${FILE_CRTM/"Create Date"/}
-    FILE_CRTM=${FILE_CRTM/":"/}
-    FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//')
+    # FILE_CRTM=${FILE_CRTM/":"/}
+    FILE_CRTM=$(echo "${FILE_CRTM}" | tr -d ":")
+    FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//') # removes the spaces
 
     # checks if the creation date is null
-    if [[ "$FILE_CRTM" == *"0000:00:00"* ]]; then
+    if [[ "$FILE_CRTM" == *"00000000"* ]]; then
         FILE_CRTM=
     fi
 }
