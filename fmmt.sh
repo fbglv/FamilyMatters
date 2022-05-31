@@ -154,12 +154,22 @@ get_file_type()
 #
 get_file_creationtime()
 {
+    case $FILE_TYPE in
+        "qtff") # Quicktime files uses the "Creation Date" exif tag instead of "Create Date"
+            EXIF_TAG_CRTM="Creation Date"
+        ;;
+        *)
+            EXIF_TAG_CRTM="Create Date"
+        ;;
+    esac
+
+
     FILE_CRTM=
-    FILE_CRTM=$(exiftool $FILE | grep -E "^Create Date" | head -n 1)
-    FILE_CRTM=${FILE_CRTM/"Create Date"/}
-    # FILE_CRTM=${FILE_CRTM/":"/}
+    FILE_CRTM=$(exiftool $FILE | grep -E "^$EXIF_TAG_CRTM" | head -n 1)
+    FILE_CRTM=${FILE_CRTM/"$EXIF_TAG_CRTM"/}
     FILE_CRTM=$(echo "${FILE_CRTM}" | tr -d ":")
     FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//') # removes the spaces
+    FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/\+[0-9][0-9][0-9][0-9]*//')
 
     # checks if the creation date is null
     if [[ "$FILE_CRTM" == *"00000000"* ]]; then
