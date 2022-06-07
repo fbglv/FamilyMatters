@@ -150,7 +150,7 @@ get_file_type()
 
 
 #
-#   Retrieves the creation date from the file EXIF metadata
+#   Retrieves the creation time from the file EXIF metadata and returns it in the YYYYMMDDhhmmss format.
 #
 get_file_creationtime()
 {
@@ -168,8 +168,8 @@ get_file_creationtime()
     FILE_CRTM=$(exiftool $FILE | grep -E "^$EXIF_TAG_CRTM" | head -n 1)
     FILE_CRTM=${FILE_CRTM/"$EXIF_TAG_CRTM"/}
     FILE_CRTM=$(echo "${FILE_CRTM}" | tr -d ":")
-    FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/^[[:space:]]*//') # removes the spaces
-    FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/\+[0-9][0-9][0-9][0-9]*//')
+    FILE_CRTM=$(echo "${FILE_CRTM}" | sed -e 's/\+[0-9][0-9][0-9][0-9]*//') # removes the time zone suffix (e.g. "+02")
+    FILE_CRTM=$(echo "${FILE_CRTM}" | tr -d " ") # removes the spaces
 
     # checks if the creation date is null
     if [[ "$FILE_CRTM" == *"00000000"* ]]; then
@@ -201,8 +201,9 @@ gen_file_name_new()
     FILE_NAME_NEW_PREFIX=
     [ "$PREFIX" ] && FILE_NAME_NEW_PREFIX=$PREFIX"_"
     
+
     if [ $FILE_CRTM ]; then
-        FILE_NAME_NEW=$FILE_NAME_NEW_PREFIX$(echo "$FILE_CRTM" | tr -d ':' | tr ' ' '_')"."$FILE_EXT_NEW
+        FILE_NAME_NEW=$FILE_NAME_NEW_PREFIX${FILE_CRTM:0:8}"_"${FILE_CRTM:8:6}"."$FILE_EXT_NEW
     fi
 }
 
@@ -318,7 +319,7 @@ main()
         #
         #   Changes the creation / last modified date file attributes
         #
-        FILE_CRTM_FS=$(echo "${FILE_CRTM}" | sed -e 's/://' | sed -e 's/://' | sed -e 's/://' | sed -e 's/:/./' | sed -e 's/[[:space:]]//')
+        FILE_CRTM_FS=$(echo ${FILE_CRTM:0:12}"."${FILE_CRTM:12:2} | tr -d " ")
         if [ -z $CHECK_ONLY ]; then
             touch -a -m -t $FILE_CRTM_FS $DIR_PROC$FILE_NAME_NEW
         fi
