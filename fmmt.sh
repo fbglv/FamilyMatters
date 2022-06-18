@@ -230,6 +230,13 @@ main()
         # skips if it's a directory
         [ -d "$FILE" ] && continue;
         
+        
+        #
+        #   Files to be ignored/skipped
+        #
+        FLS_IGNORE=("desktop.ini")
+        [[ "$FILE" =~ "$FLS_IGNORE" ]] && continue
+
 
         FILE_NAME=${FILE/".\/"/}
 
@@ -256,6 +263,7 @@ main()
             [ $DEBUG ] && echo -ne "$FILE_STATUS_TMP\r"
         fi
         [ $SLOW ] && sleep $WAIT_SHORT
+
 
         #
         #   Checks the file creation timestamp
