@@ -133,6 +133,9 @@ get_file_type()
     "heic")
         FILE_TYPE="heic"
     ;;
+    "nef")
+        FILE_TYPE="heic"
+    ;;
     "mov")
         FILE_TYPE="qtff"
     ;;
