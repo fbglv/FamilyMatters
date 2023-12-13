@@ -142,6 +142,9 @@ get_file_type()
     "mp4")
         FILE_TYPE="mp4"    
     ;;
+    "m4a")
+        FILE_TYPE="m4a"
+    ;;
     *)
         FILE_TYPE=
     ;;       
